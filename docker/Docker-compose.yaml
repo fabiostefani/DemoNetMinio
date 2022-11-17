@@ -1,0 +1,23 @@
+﻿version: "3.9"
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: "minio"
+    command: server /data --console-address ":9090"
+    environment:
+      - MINIO_ROOT_USER=fabio
+      - MINIO_ROOT_PASSWORD=fabio123
+    volumes:
+      - "~/minio/data:/data"
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    networks:
+      - minio-network
+
+networks:
+  minio-network:
+    driver: bridge
+
+volumes:
+  mq_data:    
