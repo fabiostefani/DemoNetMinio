@@ -1,23 +1,36 @@
 ﻿version: "3.9"
 services:
   minio:
-    image: quay.io/minio/minio
-    container_name: "minio"
+    image: minio/minio
     command: server /data --console-address ":9090"
+    hostname: minio
     environment:
-      - MINIO_ROOT_USER=fabio
-      - MINIO_ROOT_PASSWORD=fabio123
+      - MINIO_ACCESS_KEY= fabio
+      - MINIO_SECRET_KEY= fabio123
     volumes:
-      - "~/minio/data:/data"
+#      - .storage/minio:/data
+      - .storage/data:/data
+      - .storage/config:/root/.minio
     ports:
-      - "9000:9000"
+      - "9000:9000"      
       - "9090:9090"
     networks:
       - minio-network
+  
+#  miniomc:
+#    image: minio/mc
+#    hostname: miniomc
+#    container_name: miniomc
+#    entrypoint: >
+#      /bin/sh -c "
+#      /usr/bin/mc config host add myminio http://minio:9000/ fabio fabio123 --api S3v4;
+#      /usr/bin/mc mb myminio/teste/;
+#      /usr/bin/mc policy set public myminio/teste;
+#      exit 0;" 
 
 networks:
   minio-network:
-    driver: bridge
 
-volumes:
-  mq_data:    
+volumes:  
+  s3_data:    
+  s3_config:
