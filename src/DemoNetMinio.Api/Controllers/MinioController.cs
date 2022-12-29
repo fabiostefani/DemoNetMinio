@@ -24,4 +24,11 @@ public class MinioController : ControllerBase
         await _storageService.UploadAsync();
         return Ok();
     }
+    
+    [HttpDelete(Name = "delete")]
+    public async Task<IActionResult> Delete()
+    {
+        await _storageService.RemoveAsync();
+        return Ok();
+    }
 }

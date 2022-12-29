@@ -1,5 +1,7 @@
+using DemoNetMinio.Api.Extensions;
 using DemoNetMinio.Storage;
 using DemoNetMinio.Storage.Abstractions;
+using DemoNetMinio.Storage.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IStorageService, StorageService>();
+builder.Services.AddStorageServices(builder.Configuration);
 
 var app = builder.Build();
 

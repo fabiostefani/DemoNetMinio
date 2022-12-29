@@ -3,4 +3,5 @@
 public interface IStorageService
 {
     Task UploadAsync();
+    Task RemoveAsync();
 }

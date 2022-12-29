@@ -8,25 +8,24 @@ services:
       - MINIO_ACCESS_KEY= fabio
       - MINIO_SECRET_KEY= fabio123
     volumes:
-#      - .storage/minio:/data
       - .storage/data:/data
       - .storage/config:/root/.minio
     ports:
-      - "9000:9000"      
+      - "9000:9000"            
       - "9090:9090"
     networks:
       - minio-network
   
-#  miniomc:
-#    image: minio/mc
-#    hostname: miniomc
-#    container_name: miniomc
-#    entrypoint: >
-#      /bin/sh -c "
-#      /usr/bin/mc config host add myminio http://minio:9000/ fabio fabio123 --api S3v4;
-#      /usr/bin/mc mb myminio/teste/;
-#      /usr/bin/mc policy set public myminio/teste;
-#      exit 0;" 
+  miniomc:
+    image: minio/mc
+    hostname: miniomc
+    container_name: miniomc    
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000/ fabio fabio123 --api S3v4;
+      /usr/bin/mc mb myminio/teste/;
+      /usr/bin/mc policy set public myminio/teste;
+      exit 0;" 
 
 networks:
   minio-network:
