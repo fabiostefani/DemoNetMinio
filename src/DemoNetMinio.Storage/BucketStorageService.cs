@@ -1,34 +1,37 @@
 ﻿using DemoNetMinio.Storage.Abstractions;
-using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel;
-using Minio.Exceptions;
 
 namespace DemoNetMinio.Storage;
 
 public class BucketStorageService : IBucketStorageService
 {
-    private readonly StorageOptions _storageOptions;
-
-    public BucketStorageService(IOptions<StorageOptions> options)
+    private readonly MinioClient _minioClient;
+    public BucketStorageService(MinioClient minioClient)
     {
-        _storageOptions = options.Value;
+        _minioClient = minioClient;
     }
 
     public async Task<ListAllMyBucketsResult> ListBucketsAsync()
     {
-        var endpoint = "localhost";
-        var accessKey = "fabio";
-        var secretKey = "fabio123";
-        var secure = false;
+        return await _minioClient.ListBucketsAsync();
+    }
 
+    public async Task CreateBucketAsync(string nameBucket)
+    {
+        var makeBucketArgs = new MakeBucketArgs().WithBucket(nameBucket);
+        await _minioClient.MakeBucketAsync(makeBucketArgs);
+    }
 
-        var minio = new MinioClient()
-            .WithEndpoint(_storageOptions.HostStorage, _storageOptions.PortStorage)
-            .WithCredentials(_storageOptions.AccessKeyStorage, _storageOptions.SecretKeyStorage)
-            .WithSSL(secure)
-            .Build();
+    public async Task<bool> BucketExistsAsync(string nameBucket)
+    {
+        var bucketExistsArgs = new BucketExistsArgs().WithBucket(nameBucket);
+        return await _minioClient.BucketExistsAsync(bucketExistsArgs);
+    }
 
-        return await minio.ListBucketsAsync();
+    public async Task RemoveBucketAsync(string nameBucket)
+    {
+        var removeBucketArgs = new RemoveBucketArgs().WithBucket(nameBucket);
+        await _minioClient.RemoveBucketAsync(removeBucketArgs);
     }
 }

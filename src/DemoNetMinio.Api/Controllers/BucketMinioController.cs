@@ -24,4 +24,22 @@ public class BucketMinioController : ControllerBase
     {
         return await _storageService.ListBucketsAsync();
     }
+
+    [HttpPost]
+    public async Task Post(string nameBucket)
+    {
+        await _storageService.CreateBucketAsync(nameBucket);
+    }
+
+    [HttpGet("bucket-exists")]
+    public async Task<bool> BucketExists(string nameBucket)
+    {
+        return await _storageService.BucketExistsAsync(nameBucket);
+    }
+
+    [HttpDelete]
+    public async Task Delete(string nameBucket)
+    {
+        await _storageService.RemoveBucketAsync(nameBucket);
+    }
 }

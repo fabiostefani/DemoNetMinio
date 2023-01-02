@@ -6,5 +6,7 @@ public static class EnvironmentWebApiConstants
     public const string AccessKeyStorage = "ACCESS_KEY_STORAGE";
     public const string SecretKeyStorage = "SECRET_KEY_STORAGE";
     public const string PortStorage = "PORT_STORAGE";
-
+    public const string DefaultBucket = "DEFAULT_BUCKET";
+    public const string DefaultLocation = "DEFAULT_LOCATION";
+    
 }

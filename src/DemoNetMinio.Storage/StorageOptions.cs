@@ -6,4 +6,7 @@ public class StorageOptions
     public int PortStorage { get; set; }
     public string AccessKeyStorage { get; set; } = string.Empty;
     public string SecretKeyStorage { get; set; } = string.Empty;
+    public string DefaultBucket { get; set; } = string.Empty;
+    public string DefaultLocation { get; set; } = string.Empty;
+    
 }
