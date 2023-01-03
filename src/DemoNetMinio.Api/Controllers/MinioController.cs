@@ -19,16 +19,32 @@ public class MinioController : ControllerBase
     }
 
     [HttpPost(Name = "post")]
-    public async Task<IActionResult> Post()
+    public async Task<IActionResult> Post(IFormFile fileUpload)
     {
-        await _storageService.UploadAsync();
+        byte[] content = await ReadBytesFile(fileUpload);
+        await _storageService.UploadAsync(fileUpload.FileName, content);
         return Ok();
     }
     
-    [HttpDelete(Name = "delete")]
-    public async Task<IActionResult> Delete()
+    private static async Task<byte[]> ReadBytesFile(IFormFile formFile)
     {
-        await _storageService.RemoveAsync();
+        using var ms = new MemoryStream();
+        await formFile.CopyToAsync(ms);
+        var fileBytes = ms.ToArray();
+        return fileBytes;
+    }
+    
+    [HttpDelete(Name = "delete")]
+    public async Task<IActionResult> Delete(string objectName)
+    {
+        await _storageService.RemoveAsync(objectName);
         return Ok();
+    }
+
+    [HttpGet]
+    [Route("file-status/{fileName}")]
+    public async Task<IActionResult> GetFileStatus(string fileName)
+    {
+        return Ok(await _storageService.ObjectStatus(fileName));
     }
 }

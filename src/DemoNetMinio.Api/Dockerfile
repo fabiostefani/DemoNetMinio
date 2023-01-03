@@ -7,6 +7,10 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/DemoNetMinio.Api/DemoNetMinio.Api.csproj", "DemoNetMinio.Api/"]
 RUN dotnet restore "src/DemoNetMinio.Api/DemoNetMinio.Api.csproj"
+
+COPY ["src/DemoNetMinio.Storage/DemoNetMinio.Storage.csproj", "DemoNetMinio.Storage/"]
+RUN dotnet restore "src/DemoNetMinio.Storage/DemoNetMinio.Storage.csproj"
+
 COPY . .
 WORKDIR "/src/DemoNetMinio.Api"
 RUN dotnet build "DemoNetMinio.Api.csproj" -c Release -o /app/build

@@ -1,4 +1,5 @@
-﻿using DemoNetMinio.Storage.Abstractions;
+﻿using System.Reactive.Linq;
+using DemoNetMinio.Storage.Abstractions;
 using Minio;
 using Minio.DataModel;
 
@@ -31,6 +32,8 @@ public class BucketStorageService : IBucketStorageService
 
     public async Task RemoveBucketAsync(string nameBucket)
     {
+        var existFileBucket = await _minioClient.ListObjectsAsync(new ListObjectsArgs().WithBucket(nameBucket)).Any();
+        if (existFileBucket) throw new Exception($"Não é possível excluir o Bucket {nameBucket}. Existem arquivos adicionados.");
         var removeBucketArgs = new RemoveBucketArgs().WithBucket(nameBucket);
         await _minioClient.RemoveBucketAsync(removeBucketArgs);
     }

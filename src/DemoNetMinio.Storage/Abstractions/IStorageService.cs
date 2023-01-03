@@ -1,7 +1,10 @@
-﻿namespace DemoNetMinio.Storage.Abstractions;
+﻿using Minio.DataModel;
+
+namespace DemoNetMinio.Storage.Abstractions;
 
 public interface IStorageService
 {
-    Task UploadAsync();
-    Task RemoveAsync();
+    Task UploadAsync(string fileName, byte[] bytesFile);
+    Task RemoveAsync(string objectName);
+    Task<ObjectStat> ObjectStatus(string objectName);
 }

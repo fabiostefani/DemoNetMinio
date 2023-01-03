@@ -1,6 +1,7 @@
 ﻿using DemoNetMinio.Storage.Abstractions;
 using Microsoft.Extensions.Options;
 using Minio;
+using Minio.DataModel;
 using Minio.Exceptions;
 
 namespace DemoNetMinio.Storage;
@@ -19,22 +20,24 @@ public class StorageService : IStorageService
         _minioClient = minioClient;
         _options = options.Value;
     }
-    public async Task UploadAsync()
+    public async Task UploadAsync( string fileName, byte[] bytesFile)
     {
-        var objectName = "boleto-Outubro-2022.pdf";
-        var filePath = @"C:\\boleto-Outubro-2022.pdf";
-        var contentType = "application/pdf";
+        var contentType = "application/octet-stream";
         
         try
         {
             await CreateBucketIfNotExists(_options.DefaultBucket);
-            var putObjectArgs = new PutObjectArgs()
-                .WithBucket(_options.DefaultBucket)
-                .WithObject(objectName)
-                .WithFileName(filePath)
-                .WithContentType(contentType);
-            await _minioClient.PutObjectAsync(putObjectArgs).ConfigureAwait(false);
-            Console.WriteLine("Successfully uploaded " + objectName );
+            using (var fileStream = new MemoryStream(bytesFile))
+            {
+                var putObjectArgs = new PutObjectArgs()
+                    .WithBucket(_options.DefaultBucket)
+                    .WithObject(fileName)
+                    .WithStreamData(fileStream)
+                    .WithObjectSize(fileStream.Length)
+                    .WithContentType(contentType);
+                await _minioClient.PutObjectAsync(putObjectArgs);
+            }
+            Console.WriteLine("Successfully uploaded " + fileName );
         }
         catch (MinioException e)
         {
@@ -50,10 +53,8 @@ public class StorageService : IStorageService
         }
     }
 
-    public async Task RemoveAsync()
+    public async Task RemoveAsync(string objectName)
     {
-        var objectName = "boleto-Outubro-2022.pdf";
-        
         try
         {   
             await CreateBucketIfNotExists(_options.DefaultBucket);
@@ -68,5 +69,13 @@ public class StorageService : IStorageService
         {
             Console.WriteLine("Delete File Error: {0}", e.Message);
         }
+    }
+
+    public async Task<ObjectStat> ObjectStatus(string objectName)
+    {
+        var statObjectArgs = new StatObjectArgs()
+            .WithBucket(_options.DefaultBucket)
+            .WithObject(objectName);
+        return await _minioClient.StatObjectAsync(statObjectArgs);
     }
 }
