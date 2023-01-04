@@ -1,4 +1,5 @@
-﻿using DemoNetMinio.Storage.Abstractions;
+﻿using System.Collections;
+using DemoNetMinio.Storage.Abstractions;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel;
@@ -78,4 +79,45 @@ public class StorageService : IStorageService
             .WithObject(objectName);
         return await _minioClient.StatObjectAsync(statObjectArgs);
     }
+
+    public void RemoveAllFromBucket()
+    {
+        var docs = _minioClient.ListObjectsAsync(new ListObjectsArgs().WithBucket(_options.DefaultBucket).WithRecursive(true));
+        IDisposable subscription = docs.Subscribe(
+            // async item => Console.WriteLine("OnNext: {0}", item.Key),
+            async item => await RemoveAsync(item.Key),
+            ex => Console.WriteLine("OnError: {0}", ex.Message),
+            () => Console.WriteLine("OnComplete: {0}")
+        );
+    }
+
+    public async Task<byte[]> GetObject(string objectName)
+    {
+        string fileName = "my-file-name.pdf";
+        byte[] buffer = new byte[] { };
+        var args = new GetObjectArgs()
+            .WithBucket(_options.DefaultBucket)
+            .WithObject(objectName)
+            .WithFile("Fabio.pdf");
+            // .WithCallbackStream((stream) =>
+            // {
+            //     // buffer = new byte[strem.Length];
+            //     // strem.Read(buffer, 0, strem.);
+            //     // strem.CopyTo(Console.OpenStandardOutput());
+            //     var fileStream = File.Create(fileName);
+            //     stream.CopyTo(fileStream);
+            //     fileStream.Dispose();
+            //     var writtenInfo = new FileInfo(fileName);
+            //     var file_read_size = writtenInfo.Length;
+            //     // Uncomment to print the file on output console
+            //     // stream.CopyTo(Console.OpenStandardOutput());
+            //     Console.WriteLine(
+            //         $"Successfully downloaded object with requested offset and length {writtenInfo.Length} into file");
+            //     stream.Dispose();
+            // });
+        var document = await _minioClient.GetObjectAsync(args);
+        return buffer;
+    }
+    
+    
 }

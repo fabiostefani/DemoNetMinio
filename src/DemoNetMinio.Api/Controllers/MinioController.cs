@@ -47,4 +47,21 @@ public class MinioController : ControllerBase
     {
         return Ok(await _storageService.ObjectStatus(fileName));
     }
+
+    [HttpDelete("remove-all")]
+    public IActionResult RemoveAll()
+    {
+        _storageService.RemoveAllFromBucket();
+        return Ok();
+    }
+    
+    [HttpGet]
+    [Route("{fileName}")]
+    public async Task<IActionResult> GetObject(string fileName)
+    {
+        var document = await _storageService.GetObject(fileName);
+        return File(document, "application/pdf");
+        // return Ok();
+    }
+    
 }
