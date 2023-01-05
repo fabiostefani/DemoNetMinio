@@ -8,5 +8,6 @@ public interface IStorageService
     Task RemoveAsync(string objectName);
     Task<ObjectStat> ObjectStatus(string objectName);
     void RemoveAllFromBucket();
-    Task<byte[]> GetObject(string objectName);
+    Task<MemoryStream> GetObject(string objectName);
+    Task<string> UploadPresignedObjectAsync(string fileName, byte[] bytesFile);
 }

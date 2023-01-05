@@ -60,8 +60,16 @@ public class MinioController : ControllerBase
     public async Task<IActionResult> GetObject(string fileName)
     {
         var document = await _storageService.GetObject(fileName);
-        return File(document, "application/pdf");
-        // return Ok();
+        return new FileContentResult(document.ToArray(), "application/octet-stream");
+    }
+    
+    [HttpPost]
+    [Route("upload-presigned")]
+    public async Task<IActionResult> UploadPresignedObjectAsync(IFormFile fileUpload)
+    {
+        byte[] content = await ReadBytesFile(fileUpload);
+        var url = await _storageService.UploadPresignedObjectAsync(fileUpload.FileName, content);
+        return Ok(url);
     }
     
 }

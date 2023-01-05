@@ -91,33 +91,28 @@ public class StorageService : IStorageService
         );
     }
 
-    public async Task<byte[]> GetObject(string objectName)
+    public async Task<MemoryStream> GetObject(string objectName)
     {
-        string fileName = "my-file-name.pdf";
-        byte[] buffer = new byte[] { };
+        var memoryStream = new MemoryStream();
         var args = new GetObjectArgs()
             .WithBucket(_options.DefaultBucket)
             .WithObject(objectName)
-            .WithFile("Fabio.pdf");
-            // .WithCallbackStream((stream) =>
-            // {
-            //     // buffer = new byte[strem.Length];
-            //     // strem.Read(buffer, 0, strem.);
-            //     // strem.CopyTo(Console.OpenStandardOutput());
-            //     var fileStream = File.Create(fileName);
-            //     stream.CopyTo(fileStream);
-            //     fileStream.Dispose();
-            //     var writtenInfo = new FileInfo(fileName);
-            //     var file_read_size = writtenInfo.Length;
-            //     // Uncomment to print the file on output console
-            //     // stream.CopyTo(Console.OpenStandardOutput());
-            //     Console.WriteLine(
-            //         $"Successfully downloaded object with requested offset and length {writtenInfo.Length} into file");
-            //     stream.Dispose();
-            // });
-        var document = await _minioClient.GetObjectAsync(args);
-        return buffer;
+            .WithCallbackStream((stream) =>
+            {
+                stream.CopyTo(memoryStream);
+            });
+        await _minioClient.GetObjectAsync(args);
+        return memoryStream;
     }
-    
-    
+
+    public async Task<string> UploadPresignedObjectAsync(string fileName, byte[] bytesFile)
+    {
+        await UploadAsync(fileName, bytesFile);
+        var getObjectArgs = new PresignedGetObjectArgs()
+            .WithBucket(_options.DefaultBucket)
+            .WithObject(fileName)
+            .WithExpiry(20);
+        var url = await _minioClient.PresignedGetObjectAsync(getObjectArgs);
+        return url;
+    }
 }
